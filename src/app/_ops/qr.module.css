@@ -1,0 +1,145 @@
+/*
+ * QR card. Screen: a surface card with the tokens from globals.css.
+ * The code sits on white in both themes, because phone cameras need dark-on-light.
+ * Print: only the card prints, in black on white, centred on one page.
+ */
+
+.printArea {
+  min-width: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 22rem;
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-4);
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elev-raised);
+  text-align: center;
+}
+
+@media (min-width: 40rem) {
+  .card {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+
+.business {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.headline {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+/* White tile: the code is drawn with its own quiet zone (margin 4 in the generator). */
+.tile {
+  width: min(100%, 17rem);
+  margin-block: var(--space-2);
+  background-color: #ffffff;
+  border-radius: var(--radius-control);
+  line-height: 0;
+}
+
+.tile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.caption {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-body);
+  font-weight: 600;
+}
+
+.url {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-meta);
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  :global(html),
+  :global(body) {
+    background: #ffffff !important;
+  }
+
+  /* Hide the whole app shell, then bring back only the card and its children. */
+  :global(body) * {
+    visibility: hidden !important;
+  }
+
+  .printArea,
+  .printArea * {
+    visibility: visible !important;
+  }
+
+  .printArea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .card {
+    width: 4.5in;
+    max-width: none;
+    margin: 0 auto;
+    padding: 0.4in 0.35in;
+    gap: 0.18in;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .business,
+  .caption,
+  .url {
+    color: #000000;
+  }
+
+  .headline {
+    color: #000000;
+    font-size: 26pt;
+  }
+
+  .tile {
+    width: 3.4in;
+    margin-block: 0.05in;
+    background-color: #ffffff;
+    border-radius: 0;
+  }
+
+  .url {
+    font-size: 11pt;
+  }
+
+  @page {
+    margin: 0.5in;
+  }
+}
