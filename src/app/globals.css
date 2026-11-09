@@ -48,13 +48,13 @@
 
   --ink: #1d1b17;
   --ink-soft: #4d4a42;
-  --ink-muted: #6a665c;
+  --ink-muted: #504c43;
 
   --line: #ddd6c7;
   --line-strong: #8a8476;
 
   /* Accent: berry. Used for the primary action, the active destination and links. */
-  --accent: #8b2c5b;
+  --accent: #872857;
   --accent-hover: #74234b;
   --accent-soft: #f5e6ee;
   --accent-ink: #ffffff;
@@ -62,14 +62,14 @@
   --focus: #1d1b17;
 
   /* Semantic colours. Distinct from the accent, and always paired with text or an icon. */
-  --good: #1f6b3b;
+  --good: #065b2d;
   --good-soft: #e4f1e7;
-  --warn: #7a4b00;
+  --warn: #724603;
   --warn-soft: #fbefd3;
-  --crit: #a3261a;
+  --crit: #97180e;
   --crit-soft: #fbe5e1;
-  --crit-solid: #a3261a;
-  --crit-solid-hover: #8a1f15;
+  --crit-solid: #97180e;
+  --crit-solid-hover: #821409;
   --crit-solid-ink: #ffffff;
 
   /* Elevation: layered, warm-tinted shadows. Rest for cards, raised for decisions, float for menus. */
@@ -109,12 +109,12 @@
 
     --ink: #f4efe6;
     --ink-soft: #cec7b9;
-    --ink-muted: #a9a294;
+    --ink-muted: #aca596;
 
     --line: #3a362e;
     --line-strong: #7e786b;
 
-    --accent: #e79bc1;
+    --accent: #ec9fc5;
     --accent-hover: #f2b2d2;
     --accent-soft: #3a2331;
     --accent-ink: #2a0f1e;
@@ -149,12 +149,12 @@
 
   --ink: #f4efe6;
   --ink-soft: #cec7b9;
-  --ink-muted: #a9a294;
+  --ink-muted: #aca596;
 
   --line: #3a362e;
   --line-strong: #7e786b;
 
-  --accent: #e79bc1;
+  --accent: #ec9fc5;
   --accent-hover: #f2b2d2;
   --accent-soft: #3a2331;
   --accent-ink: #2a0f1e;
