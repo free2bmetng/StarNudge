@@ -204,6 +204,7 @@ create table review_requests (
   source text not null check (source in ('automation','manual')),
   idempotency_key text not null,
   channel text check (channel in ('sms','email')),
+  template_id uuid references templates(id) on delete set null,
   status text not null check (status in ('queued','deferred','suppressed','sending','sent','delivered','failed','expired','cancelled')),
   status_reason text,
   due_at timestamptz not null,
@@ -314,7 +315,7 @@ create table audit_log (
   created_at timestamptz not null default now()
 );
 
--- Sandbox sender numbers live in the fictional 555-0150 .. 555-0199 range.
+-- Sandbox sender numbers are fictional: +1 212 555-0150 .. 555-0199.
 create sequence sandbox_sender_seq start 150 minvalue 150 maxvalue 199 no cycle;
 
 -- Row-level security -------------------------------------------------------

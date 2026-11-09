@@ -55,6 +55,11 @@ function keyBytes(name: string): Buffer {
   return bytes;
 }
 
+/** Sandbox flag alone, for UI that must render at build time without database settings. */
+export function isSandboxMode(): boolean {
+  return process.env.SANDBOX_MODE !== 'false';
+}
+
 /** Reads configuration on every call so tests can change the environment between cases. */
 export function cfg(): Config {
   return {

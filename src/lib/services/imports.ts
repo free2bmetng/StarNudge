@@ -8,7 +8,7 @@ import { enqueueAutomation } from './pipeline';
 
 export type ImportSummary =
   | { ok: false; error: string }
-  | { ok: true; created: number; merged: number; skipped: number; errors: ImportRowError[] };
+  | { ok: true; batchId: string; created: number; merged: number; skipped: number; errors: ImportRowError[] };
 
 /**
  * Imports customers and visits from a CSV file. Each row is handled on its own.
@@ -148,6 +148,6 @@ export async function importCustomers(
       [batchId, created, merged, skipped, JSON.stringify(errors.slice(0, 500))],
     );
     await audit(tx, businessId, `owner:${userId}`, 'import.completed', 'import_batch', batchId);
-    return { ok: true as const, created, merged, skipped, errors };
+    return { ok: true as const, batchId, created, merged, skipped, errors };
   });
 }

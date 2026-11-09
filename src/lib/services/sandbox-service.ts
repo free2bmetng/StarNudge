@@ -30,7 +30,7 @@ export async function approveSender(businessId: string, userId: string): Promise
     let number = row.sender_number;
     if (!number) {
       const seq = await q<{ n: string }>(tx, `select nextval('sandbox_sender_seq')::text as n`);
-      number = `+1555${seq[0].n.padStart(4, '0')}`;
+      number = `+1212555${seq[0].n.padStart(4, '0')}`;
     }
     await tx.query(
       `update sender_registrations set status = 'approved', sender_number = $2, updated_at = now() where business_id = $1`,
