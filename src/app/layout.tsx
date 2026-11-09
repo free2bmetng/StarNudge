@@ -9,8 +9,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    // suppressHydrationWarning: browser extensions (grammar checkers, dark-mode tools) add
+    // attributes to <html> and <body> before React loads. That mismatch is harmless.
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
