@@ -1,19 +1,31 @@
-import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
 import { getDashboard } from '@/lib/services/dashboard';
 import { logReviewAction } from '@/app/actions/customers';
-import { buttonClass, cardClass, Flash, inputClass, labelClass, param, PageTitle, Section, Shell } from '@/app/_components/ui';
+import { Button, Flash, inputClass, labelClass, param, PageTitle, Shell, StatTile } from '@/app/_components/ui';
+import { NextStep, Panel, QuietStats, StatusList, type QuietRow, type StatusItem, type Tone } from '@/app/_dashboard/parts';
 
 export const dynamic = 'force-dynamic';
 
-function Stat({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
-  return (
-    <div className={cardClass}>
-      <p className="text-sm font-medium text-stone-700">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-stone-900">{value}</p>
-      {hint ? <p className="mt-1 text-sm text-stone-600">{hint}</p> : null}
-    </div>
-  );
+const count = (n: number): string => n.toLocaleString('en-US');
+
+/* Database values such as "not_started" read as a sentence: "Not started". */
+const words = (s: string): string => {
+  const plain = s.replace(/_/g, ' ');
+  return plain.charAt(0).toUpperCase() + plain.slice(1);
+};
+
+function senderTone(status: string): Tone {
+  if (status === 'approved') return 'good';
+  if (status === 'submitted') return 'warn';
+  if (status === 'rejected' || status === 'failed') return 'crit';
+  return 'neutral';
+}
+
+function subscriptionTone(status: string): Tone {
+  if (status === 'active') return 'good';
+  if (status === 'canceled_at_period_end') return 'warn';
+  if (status === 'past_due' || status === 'unpaid' || status === 'canceled') return 'crit';
+  return 'neutral';
 }
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -21,53 +33,82 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const sp = await searchParams;
   const d = await getDashboard(s.businessId);
 
+  const quiet: QuietRow[] = [
+    { label: 'Failed', value: count(d.failed) },
+    { label: 'Opted out', value: count(d.optedOut) },
+    { label: 'Link clicks', value: count(d.clicks), hint: 'Scanners can inflate this' },
+    { label: 'Owner-reported reviews', value: count(d.ownerReviews), hint: 'Google does not link reviews to requests' },
+    { label: 'Customers', value: count(d.customers) },
+  ];
+
+  const status: StatusItem[] = [
+    d.reviewLinkConfirmed
+      ? { label: 'Review link', tone: 'good', text: 'Confirmed' }
+      : { label: 'Review link', tone: 'warn', text: 'Not confirmed' },
+    { label: 'Text sender', tone: senderTone(d.senderStatus), text: words(d.senderStatus) },
+    { label: 'Subscription', tone: subscriptionTone(d.subscriptionStatus), text: words(d.subscriptionStatus) },
+  ];
+
   return (
     <Shell>
       <PageTitle lead={`Last ${d.periodDays} days`}>Dashboard</PageTitle>
       <Flash error={param(sp.error)} notice={param(sp.notice)} />
 
-      <div className={`${cardClass} mb-4 border-amber-300 bg-amber-50`}>
-        <p className="text-sm font-semibold uppercase tracking-wide text-amber-900">Next step</p>
-        <p className="mt-1 text-base text-stone-900">{d.next.text}</p>
-        <Link href={d.next.href} className="mt-3 inline-block font-medium underline">{d.next.label}</Link>
-      </div>
+      <div className="flex flex-col gap-6 sm:gap-8">
+        <NextStep text={d.next.text} href={d.next.href} label={d.next.label} />
 
-      <div className="mb-4 grid grid-cols-2 gap-3">
-        <Stat label="Requests sent" value={d.sent} />
-        <Stat
-          label="Delivered"
-          value={d.delivered === 'unknown' ? 'Unknown' : d.delivered}
-          hint={d.delivered === 'unknown' ? 'No delivery receipts yet' : undefined}
-        />
-        <Stat label="Failed" value={d.failed} />
-        <Stat label="Opted out" value={d.optedOut} />
-        <Stat label="Link clicks" value={d.clicks} hint="Scanners can inflate this" />
-        <Stat label="Owner-reported reviews" value={d.ownerReviews} hint="Google does not link reviews to requests" />
-        <Stat label="Waiting to send" value={d.pending} />
-        <Stat label="Customers" value={d.customers} />
-      </div>
-
-      <Section title="Log a review you received">
-        <p className="mb-3 text-base text-stone-800">
-          Record reviews you see on Google. These are counted as owner-reported, because Google does not tell
-          StarNudge which request a review came from.
-        </p>
-        <form action={logReviewAction} className="space-y-3">
-          <div>
-            <label htmlFor="note" className={labelClass}>Note (optional)</label>
-            <input id="note" name="note" maxLength={200} className={inputClass} placeholder="For example: 5-star review, Tuesday" />
+        <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+            <div className="col-span-2 grid sm:col-span-1">
+              <StatTile label="Requests sent" value={d.sent} />
+            </div>
+            <div className="grid">
+              <StatTile
+                label="Waiting to send"
+                value={d.pending}
+                hint="Not sent yet"
+                tone={d.pending > 0 ? 'warn' : 'default'}
+              />
+            </div>
+            <div className="grid">
+              <StatTile
+                label="Delivered"
+                value={d.delivered === 'unknown' ? 'Unknown' : count(d.delivered)}
+                hint={d.delivered === 'unknown' ? 'No delivery receipts yet' : undefined}
+              />
+            </div>
           </div>
-          <button type="submit" className={buttonClass}>Log review</button>
-        </form>
-      </Section>
+          <QuietStats rows={quiet} />
+        </div>
 
-      <Section title="Status">
-        <ul className="space-y-1 text-base text-stone-800">
-          <li>Review link: {d.reviewLinkConfirmed ? 'confirmed' : 'not confirmed'}</li>
-          <li>Text sender: {d.senderStatus.replace(/_/g, ' ')}</li>
-          <li>Subscription: {d.subscriptionStatus.replace(/_/g, ' ')}</li>
-        </ul>
-      </Section>
+        <Panel id="dash-log-review" title="Log a review you received">
+          <p className="m-0 mb-4 max-w-prose text-body text-ink-soft">
+            Record reviews you see on Google. These are counted as owner-reported, because Google does not tell StarNudge
+            which request a review came from.
+          </p>
+          <form action={logReviewAction} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div>
+              <label htmlFor="note" className={labelClass}>
+                Note (optional)
+              </label>
+              <input
+                id="note"
+                name="note"
+                maxLength={200}
+                className={inputClass}
+                placeholder="For example: 5-star, Tuesday"
+              />
+            </div>
+            <Button type="submit" variant="secondary" className="w-full sm:w-auto">
+              Log review
+            </Button>
+          </form>
+        </Panel>
+
+        <Panel id="dash-status" title="Status">
+          <StatusList items={status} />
+        </Panel>
+      </div>
     </Shell>
   );
 }

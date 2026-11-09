@@ -1,9 +1,14 @@
+import type { Metadata } from 'next';
 import { submitContactAction } from '@/app/actions/contact';
-import { buttonClass, Flash, hintClass, inputClass, labelClass, param, PageTitle, Public } from '@/app/_components/ui';
-import { q } from '@/lib/db';
-import { pool } from '@/lib/db';
+import { Button, Card, Flash, hintClass, inputClass, labelClass, param, PageTitle } from '@/app/_components/ui';
+import { PublicFrame } from '@/app/_public/PublicFrame';
+import { pool, q } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Contact the business',
+};
 
 export default async function ContactPage({
   params,
@@ -17,20 +22,16 @@ export default async function ContactPage({
   const found = await q<{ business_id: string | null }>(pool(), 'select business_id from find_short_link($1)', [code]);
   const exists = Boolean(found[0]?.business_id);
   return (
-    <Public>
+    <PublicFrame>
       <PageTitle lead="Tell the business what went wrong. Your message goes straight to the owner.">Have a problem? Contact us</PageTitle>
       {!exists ? (
-        <p role="alert" className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-base text-red-900">
-          This link is no longer valid.
-        </p>
+        <Flash error="This link is no longer valid." />
       ) : sp.sent ? (
-        <p role="status" className="rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-base text-emerald-900">
-          Thank you. The business has your message.
-        </p>
+        <Flash notice="Thank you. The business has your message." />
       ) : (
-        <>
+        <Card>
           <Flash error={param(sp.error)} />
-          <form action={submitContactAction} className="space-y-4">
+          <form action={submitContactAction} className="grid gap-6">
             <input type="hidden" name="code" value={code} />
             <div>
               <label htmlFor="message" className={labelClass}>Your message</label>
@@ -38,13 +39,13 @@ export default async function ContactPage({
             </div>
             <div>
               <label htmlFor="replyTo" className={labelClass}>How should they reach you? (optional)</label>
-              <input id="replyTo" name="replyTo" maxLength={200} className={inputClass} autoComplete="email" />
-              <p className={hintClass}>An email address or phone number.</p>
+              <input id="replyTo" name="replyTo" maxLength={200} className={inputClass} autoComplete="email" aria-describedby="replyTo-hint" />
+              <p id="replyTo-hint" className={hintClass}>An email address or phone number.</p>
             </div>
-            <button type="submit" className={buttonClass}>Send message</button>
+            <Button type="submit" className="w-full">Send message</Button>
           </form>
-        </>
+        </Card>
       )}
-    </Public>
+    </PublicFrame>
   );
 }

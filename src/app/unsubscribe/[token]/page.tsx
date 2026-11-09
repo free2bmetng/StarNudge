@@ -1,7 +1,28 @@
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import { parseUnsubscribeToken } from '@/lib/unsubscribe';
-import { buttonClass, PageTitle, Public } from '@/app/_components/ui';
+import { Icon, type IconName } from '@/app/_components/icons';
+import { Button, Card, PageTitle } from '@/app/_components/ui';
+import { PublicFrame } from '@/app/_public/PublicFrame';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Unsubscribe',
+};
+
+/** A result card: a status icon beside the words, so the outcome never relies on colour alone. */
+function Outcome({ tone, icon, children }: { tone: 'good' | 'crit'; icon: IconName; children: ReactNode }) {
+  const toneClass = tone === 'good' ? 'bg-good-soft text-good' : 'bg-crit-soft text-crit';
+  return (
+    <div className="flex items-start gap-4">
+      <span aria-hidden="true" className={`grid h-11 w-11 shrink-0 place-items-center rounded-pill ${toneClass}`}>
+        <Icon name={icon} className="text-title" />
+      </span>
+      <div className="min-w-0 text-body text-ink">{children}</div>
+    </div>
+  );
+}
 
 export default async function UnsubscribePage({
   params,
@@ -17,27 +38,37 @@ export default async function UnsubscribePage({
 
   if (!valid) {
     return (
-      <Public>
+      <PublicFrame>
         <PageTitle>This link is not valid</PageTitle>
-        <p className="text-base">Reply to the email you received, or contact the business directly.</p>
-      </Public>
+        <Card>
+          <Outcome tone="crit" icon="alert">
+            Reply to the email you received, or contact the business directly.
+          </Outcome>
+        </Card>
+      </PublicFrame>
     );
   }
   if (done) {
     return (
-      <Public>
+      <PublicFrame>
         <PageTitle>You are unsubscribed</PageTitle>
-        <p className="text-base">You will not receive more messages from this business on any channel.</p>
-      </Public>
+        <Card>
+          <Outcome tone="good" icon="check">
+            You will not receive more messages from this business on any channel.
+          </Outcome>
+        </Card>
+      </PublicFrame>
     );
   }
   return (
-    <Public>
+    <PublicFrame>
       <PageTitle>Stop messages from this business?</PageTitle>
-      <p className="mb-4 text-base">This stops all messages from the business to you, by email and text.</p>
-      <form method="post" action={`/api/unsubscribe?token=${encodeURIComponent(token)}&ui=1`}>
-        <button type="submit" className={buttonClass}>Unsubscribe</button>
-      </form>
-    </Public>
+      <Card>
+        <p className="m-0 text-body text-ink">This stops all messages from the business to you, by email and text.</p>
+        <form method="post" action={`/api/unsubscribe?token=${encodeURIComponent(token)}&ui=1`} className="mt-6">
+          <Button type="submit" className="w-full">Unsubscribe</Button>
+        </form>
+      </Card>
+    </PublicFrame>
   );
 }
