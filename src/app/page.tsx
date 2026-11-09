@@ -55,13 +55,13 @@ const PROMISES = [
 function SiteFooter() {
   return (
     <div className="border-t border-line bg-surface">
-      <div className="mx-auto flex max-w-[64rem] flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <div className="mx-auto flex max-w-[64rem] flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="m-0 text-meta text-ink-soft">Compliant Google review requests for local businesses.</p>
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-2">
-          <Link href="/privacy" className="sn-header-link">
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-6">
+          <Link href="/privacy" className="sn-header-link px-0">
             Privacy notice
           </Link>
-          <Link href="/login" className="sn-header-link">
+          <Link href="/login" className="sn-header-link px-0">
             Log in
           </Link>
         </nav>

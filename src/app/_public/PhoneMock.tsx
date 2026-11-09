@@ -26,11 +26,11 @@ export function PhoneMock() {
               <p className="m-0 text-body text-ink">
                 Hi Maria, thanks for your visit. Would you share a few words about it?
               </p>
-              <p className="m-0 mt-2 break-all text-body">
-                <span className="text-accent underline underline-offset-4">https://g.page/r/example-review</span>
+              <p className="m-0 mt-2 text-body">
+                <span className="text-accent underline underline-offset-4">https://g.page/r/example</span>
               </p>
-              <p className="m-0 mt-3 break-all text-meta text-ink-soft">
-                Have a problem? Contact us: https://starnudge.example/c/k7x2
+              <p className="m-0 mt-3 text-meta text-ink-soft">
+                Have a problem? Contact us: https://sn.example/c/k7x2
               </p>
               <p className="m-0 mt-1 text-meta text-ink-soft">Reply STOP to opt out.</p>
             </div>
